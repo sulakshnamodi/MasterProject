@@ -5,6 +5,7 @@ import os
 
 # SETUP AND DATA LOADING 
 nor_data_root = r'G:\My Drive\Sulakshna\Sulakshna Drive\Codes\MasterProject\data'
+output_folder = r'G:\My Drive\Sulakshna\Sulakshna Drive\Codes\MasterProject\results'
 nor_data_filename = 'prgnorp2.csv'
 nor_data_filepath = os.path.join(nor_data_root, nor_data_filename)
 
@@ -94,5 +95,8 @@ def report_categorical_distribution(df, cols, filename='norway_categorical_distr
 
 
 # --- 4. EXECUTION ---
-report_numerical_distribution(nor_data_df, numerical_cols)
-report_categorical_distribution(nor_data_df, categorical_cols)
+numerical_filepath = os.path.join(output_folder, 'norway_numerical_distribution_RAW.csv')
+categorial_filepath = os.path.join(output_folder, 'norway_categorical_distribution_WITH_CODES.csv')
+
+report_numerical_distribution(nor_data_df, numerical_cols, filename=numerical_filepath)
+report_categorical_distribution(nor_data_df, categorical_cols, filename=categorial_filepath)

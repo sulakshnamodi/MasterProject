@@ -15,14 +15,25 @@ also summarize the appraoch (so you learn how to design code, like in words): fo
 
 
 26.11: 6 hours
+Read more about functions - 10 min
 ALWAYS check which branch are working on.
 Always plot and save results in results folder
 Modify the code to plot only those variables which are available in Norway
 Change the plot title to description (variable name), to have both of it
 Find the description of the codes (., 1, 2)
 
+
 For github*
 1) Fetch origin
 2) Check the files that are changed
 3) Describe commit and add description
 4) Push to branch
+
+
+
+27.11.25
+WHAT TO DO? After generating the two csv files, Categorial and Numerical files with raw missing data.
+
+1. Data Completeness (The Missing Value Check)
+2. Data Validity (The Consistency Check)
+3. Data Distribution (The Statistical Check)
