@@ -31,9 +31,3 @@ For github*
 
 
 
-27.11.25
-WHAT TO DO? After generating the two csv files, Categorial and Numerical files with raw missing data.
-
-1. Data Completeness (The Missing Value Check)
-2. Data Validity (The Consistency Check)
-3. Data Distribution (The Statistical Check)
