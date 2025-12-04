@@ -3,6 +3,7 @@
 # and saves the dataframe for reusing in future
 
 import pandas as pd
+import numpy as np
 import matplotlib.pyplot as plt
 import os, sys
 
@@ -42,7 +43,6 @@ column_mapping = column_mapping_series.to_dict()
 # don't correspond to a column in norway_df.
 norway_df = norway_df.rename(columns=column_mapping)
 
-
 # Remove all the variables which as . values everywhere 
 # Find columns where ALL values are the string '.'
 # 1. Use the equality operator (==) to check every cell.
@@ -52,8 +52,29 @@ cols_to_drop = norway_df.columns[
     (norway_df == '.').all()
 ].tolist()
 
-# 4. Drop the identified columns from the DataFrame
+
+
+# Drop the identified columns from the DataFrame
 norway_df = norway_df.drop(columns=cols_to_drop)
+
+
+norway_df = norway_df.replace('.', np.nan)
+print("✅ Replaced '.' with np.nan across the entire DataFrame.")
+
+# Iterate through columns and convert to numeric (float)
+# The errors='coerce' argument will turn any remaining non-numeric strings (if any) into NaN,
+# ensuring the final conversion to float is successful.
+for col in norway_df.columns:
+    # Check if the column is currently a string/object type that needs conversion
+    if norway_df[col].dtype == 'object':
+        
+        # Attempt conversion. If the column is mostly non-numeric (e.g., names), 
+        # this will result in a column full of NaNs, but it successfully changes the dtype.
+        norway_df[col] = pd.to_numeric(norway_df[col], errors='coerce')
+
+# After using pd.to_numeric, all resulting numeric columns are automatically float64.
+print("✅ Converted all suitable columns to float.")
+
 
 
 # Save the data frame as csv
