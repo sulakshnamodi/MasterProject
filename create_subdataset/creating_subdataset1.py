@@ -112,7 +112,7 @@ for col in all_variables:
 # print(all_variables_df.dtypes)
 
 #View the main weight and the first 5 replicate weights for the first person
-# print(all_variables_df[['SPFWT0', 'SPFWT1', 'SPFWT2', 'SPFWT3', 'SPFWT4', 'SPFWT5']].iloc[0])
+print(all_variables_df[['SPFWT0', 'SPFWT1', 'SPFWT2', 'SPFWT3', 'SPFWT4', 'SPFWT5']].iloc[0])
 
 # Step6: Save in to output formats (csv, pkl)
     # - For csv, modify column names to readable lables
@@ -123,12 +123,6 @@ for col in all_variables:
 # Rename column names in all_variables_df to readable values
 column_mapping_series = codebook_df.drop_duplicates(subset=['Variable'], keep='first').set_index('Variable')['Label']
 column_mapping = column_mapping_series.to_dict()
-
-
-# Rename the columns in the dataframe
-all_variables_df = all_variables_df.rename(columns=column_mapping) 
-
-
 
 # Save to CSV with readable headers
 # We use .rename() to change headers for the export
