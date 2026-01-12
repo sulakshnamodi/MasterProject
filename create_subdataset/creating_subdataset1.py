@@ -52,13 +52,13 @@ background_vars = ['CNTRYID', 'GENDER_R', 'C2_D05', 'PAIDWORK12']
 
 '''
 Education Level Variables
-EDCAT6_TC1: Highest level of formal education obtained (6 categories, ISCED 97) (derived),
-    1: Lower secondary or less (ISCED 1,2, 3C short or less); 2: Upper secondary (ISCED 3A-B, C long); 3: Post-secondary, non-tertiary (ISCED 4A-B-C); 4: Tertiary – professional degree (ISCED 5B); 5: Tertiary – bachelor degree (ISCED 5A); 6: Tertiary – master/research degree (ISCED 5A/6)
+EDCAT6_TC1 Highest level of formal education obtained (6 categories, ISCED 97) (derived),
+    1: Lowe:r secondary or less (ISCED 1,2, 3C short or less); 2: Upper secondary (ISCED 3A-B, C long); 3: Post-secondary, non-tertiary (ISCED 4A-B-C); 4: Tertiary – professional degree (ISCED 5B); 5: Tertiary – bachelor degree (ISCED 5A); 6: Tertiary – master/research degree (ISCED 5A/6)
 VET_TC1: Respondent’s upper secondary/post-secondary education is vocationally oriented (derived, Trend PIAAC 1/2)
      0: No; 1: Yes
 VETC2:Respondent’s highest level of education is vocationally oriented (derived)
      0: No; 1: Yes
-'''
+''' 
 education_vars = ['EDCAT6_TC1', 'VET_TC1', 'VETC2']
 
 '''
