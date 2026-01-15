@@ -10,7 +10,7 @@ import seaborn as sns
 
 # RQ1: How do the levels of cognitive skills (literacy, numeracy, problem-solving) compare between university and vocationally educated adults at work in Norway?
 
-# Load the Sub-dataset
+# Setting of subdataset file
 subdataset_root = r'G:\My Drive\Sulakshna\Sulakshna Drive\Codes\MasterProject\data\preprocessed\subdataset1'
 subdataset_filename = 'piaac_norway_subdataset1.pkl'
 subdataset_filepath = os.path.join(subdataset_root, subdataset_filename)
@@ -20,9 +20,10 @@ outputfolder = r'G:\My Drive\Sulakshna\Sulakshna Drive\Codes\MasterProject\resul
 with open(subdataset_filepath, 'rb') as f:
     loaded_data = pickle.load(f)
 
+
 subdataset_df = loaded_data['dataframe']
-metadata = loaded_data['metadata']
- 
+metadata = loaded_data['metadata'] # dictionary from the codebook
+
 coeff_list = []
 intercept_list = []
 sampling_variance_list = []
@@ -31,25 +32,36 @@ fay_factor = 0.3 # Fay's Method, down weights a group of people by 30% and up-we
 variance_factor = 1 / (80 * (1 - fay_factor)**2) 
 
 # Iterate over each plausible value
+# Loop runs a regression for each PVs and store result in coeff_list(coefficient/slope) and intercept_list
 for i in range(1,11):
 
     # Name of each PV of literacy score
     current_score_column = 'PVLIT' + str(i)
 
     # Removing the rows with missing values
+    # Create a list call variable. For the first loop the variables are EDCT6_TC1 and PVLIT1
+    # drop all the rows with there are missing values in these two variables
+    # Then it saved it in df_clean
     variables = ['EDCAT6_TC1', current_score_column]
     df_clean = subdataset_df.dropna(subset=variables)
 
+    # df_clean['EDCAT6_TC1'] create a single column of data (Pandas Series)
+    # .value convert series into NumPy array, reshape(-1. 1) tilt the list from horizontal to vertical (a 2D column vector)
     education = df_clean['EDCAT6_TC1'].values.reshape(-1,1)
     score = df_clean[current_score_column].values.reshape(-1,1)
     w0 = df_clean['SPFWT0']
+
+    # Note: What is the difference between SPFWT0 and SPFWT1- SPFWT80
+    # SPFWT0: Full sample weight, popåulation representation, it affects the coefficient/mean (point estimate/slope)
+    # SPFWT1- SPFWT80: Replicate weights used to calculate Variance, which determines the Standard Error, which ultimately determines Significance.
+
 
     # Initialising  and fitting the model
     model = LinearRegression()
     model.fit(X=education, y=score, sample_weight=w0)
 
-    original_coeff = model.coef_
-    original_intercept = model.intercept_
+    original_coeff = model.coef_ # pull the value which represent the slope from the model, how much literacy score chnages for every 1-unit increase in Education
+    original_intercept = model.intercept_ # the intercept, the value of literacy score when Education is 0
 
     # View the values of m and c
     print(f"Coefficients: {original_coeff}")
@@ -59,10 +71,9 @@ for i in range(1,11):
     coeff_list.append(original_coeff)
     intercept_list.append(original_intercept)
 
-
+ # Handling 'Sampling Variance'
     replicate_coeff = []
-
-    # Use the same score and education , but calculate regression using 80 different weights
+    # Use the same score and education (for each PV) and calculate how much the coefficient varies across those 80 different weights
     for j in range(1, 81):
 
         current_replicate_weight_column = 'SPFWT' + str(j)
@@ -74,7 +85,7 @@ for i in range(1,11):
 
         replicate_coeff.append(modeltemp.coef_)
 
-    
+    # sampling variance: Uncertaity from people, refer to definition of fay's factor
     sampling_variance =  ((replicate_coeff - original_coeff)**2).sum() * variance_factor
     print(sampling_variance)
     sampling_variance_list.append(sampling_variance)

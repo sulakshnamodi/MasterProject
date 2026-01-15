@@ -124,13 +124,13 @@
 # for index, alphabets in enumerate(letters):
 #     print(index, alphabets)
 
-# #adding and removing item in a list
-# letters = ["a", "b", "c"]
+#adding and removing item in a list
+letters = ["a", "b", "c"]
 
-# #add
-# letters.append("d") #insert at the end 
-# letters.insert(1, "a*") #insert at selected position
-
+#add
+letters.append("d") #insert at the end 
+letters.insert(1, "a*") #insert at selected position
+print(letters)
 # #remove
 # letters.pop() # remove element at the end of the list
 # letters.pop(1) #remove at the selected position
