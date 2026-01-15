@@ -62,5 +62,36 @@ df.at['Alice', 'age'] = float('nan')
 # for i, row in df.iterrows():
 #     print(row['age'])
 
-for i, col in df.items():
-    print(col)
+# for i, col in df.items():
+#     print(col)
+
+
+
+
+#--------------------------------------------------------------------------------------------------------------------
+# Saving a file as pkl
+#
+import pickle
+
+data = {
+    "alpha" : [3, 5, 7],
+    "beta" : [4, 5, 6]
+}                           #Use curly braket {} for dictionary
+
+with open('data.bin', 'wb') as f:   
+    pickle.dump(data, f) # actual saving happens here, the dictionary 'data' is being saved in the file we just opened as f
+
+# Note:
+#1. instead of .bin, .pkl or .pickle can be used
+#2. data.bin is the file being created
+# 3. wb is the mode in which the data is being saved, that is in Write Binary Mode
+# - w (Write): "Create a new file or empty the existing one."
+# - b (Binary): "Don't treat this as text; handle it as raw data (0s and 1s)"
+
+with open('data.bin', 'rb') as f:
+    load_data = pickle.load(f)
+    print(load_data) # return a dictionary
+
+#-----------------------------------------------------------------------------
+for i in range(1,11):
+    print('PVLIT' + str(i))
