@@ -53,7 +53,7 @@ background_vars = ['CNTRYID', 'GENDER_R', 'C2_D05', 'PAIDWORK12']
 '''
 Education Level Variables
 EDCAT6_TC1 Highest level of formal education obtained (6 categories, ISCED 97) (derived),
-    1: Lowe:r secondary or less (ISCED 1,2, 3C short or less); 2: Upper secondary (ISCED 3A-B, C long); 3: Post-secondary, non-tertiary (ISCED 4A-B-C); 4: Tertiary – professional degree (ISCED 5B); 5: Tertiary – bachelor degree (ISCED 5A); 6: Tertiary – master/research degree (ISCED 5A/6)
+    1: Lower secondary or less (ISCED 1,2, 3C short or less); 2: Upper secondary (ISCED 3A-B, C long); 3: Post-secondary, non-tertiary (ISCED 4A-B-C); 4: Tertiary – professional degree (ISCED 5B); 5: Tertiary – bachelor degree (ISCED 5A); 6: Tertiary – master/research degree (ISCED 5A/6)
 VET_TC1: Respondent’s upper secondary/post-secondary education is vocationally oriented (derived, Trend PIAAC 1/2)
      0: No; 1: Yes
 VETC2:Respondent’s highest level of education is vocationally oriented (derived)
@@ -75,7 +75,14 @@ WRITHOMEC2_WLE_CA: Index of use of writing skills at home, categorised WLE (deri
 READWORKC2_WLE_CA_T1: Index of use of reading skills at work (prose and document texts), categorised WLE (derived) 
 READHOMEC2_WLE_CA_T1: Index of use of reading skills at home (prose and document texts), categorised WLE (derived)
 '''
-literacy_usage_vars = ['WRITWORKC2_WLE_CA', 'WRITHOMEC2_WLE_CA', 'READWORKC2_WLE_CA_T1', 'READHOMEC2_WLE_CA_T1']
+literacy_usage_vars = ['WRITWORKC2_WLE_CA', 'WRITHOMEC2_WLE_CA', 'READWORKC2_WLE_CA_T1', 'READHOMEC2_WLE_CA_T1', 'F2_Q01a']
+
+'''
+Parents's or Guardian's Education Variables
+PAREDC2: Highest of mother or father’s level of education (derived) 
+1: Neither parent has attained upper secondary 2: At least one parent has attained secondary and post-secondary, non-tertiary; 3: At least one parent has attained tertiary
+'''
+parents_occupation = ['PAREDC2']
 
 
 '''
@@ -92,13 +99,15 @@ D2_Q04:Current work - Employee or self-employed
 '''
 work_vars = ['ISCOSKIL4', 'D2_Q04' ]
 
-
 # Step3: Access the data of these variables from raw data file
-all_variables = background_vars + education_vars + literacy_scores_vars + sampling_weight_vars + literacy_usage_vars + work_vars
+# Apply the function categorize_education to add as an extra column
+all_variables = background_vars + education_vars + literacy_scores_vars + parents_occupation + sampling_weight_vars + literacy_usage_vars + work_vars
+
 
 # Step4: Verify the new dataframe
 # Create a dataframe with all variables all_variables
-all_variables_df = norway_df[all_variables]
+all_variables_df = norway_df[all_variables].copy()
+
 
 # Step5: Clean and Preprocess the new dataframe
     # - Removing . columns, Nan Values
@@ -107,6 +116,29 @@ all_variables_df = norway_df[all_variables]
 # errors='coerce' turns non-numeric strings (like '.') into NaN
 for col in all_variables:
     all_variables_df[col] = pd.to_numeric(all_variables_df[col], errors='coerce')
+
+# Function for categorising:
+# Group 0: University (Non-vocational AND Level 5 or 6)
+# Group 1: Vocational (VETC2 is 1)
+
+def categorize_education(row):
+    # Vocational (VETC2 is 1)
+    if row['VETC2'] == 1:
+        return 1 
+    # University (Non-vocational AND Level 5 or 6)
+    elif row['VETC2'] == 0 and row['EDCAT6_TC1'] >= 5:
+        return 0 
+    # Everyone else (General high school, etc.)
+    else:
+        return np.nan
+
+# Apply the function to create the new column
+all_variables_df['ED_GROUP'] = all_variables_df.apply(categorize_education, axis=1)
+
+# Optional: Check how many people are in each group
+print(all_variables_df['ED_GROUP'].value_counts(dropna=False))
+
+
 
 # Check the data types of all columns
 # print(all_variables_df.dtypes)
@@ -121,6 +153,7 @@ print(all_variables_df[['SPFWT0', 'SPFWT1', 'SPFWT2', 'SPFWT3', 'SPFWT4', 'SPFWT
 # Create a dictionary for readable labels (mapping)
 
 # Rename column names in all_variables_df to readable values
+
 column_mapping_series = codebook_df.drop_duplicates(subset=['Variable'], keep='first').set_index('Variable')['Label']
 column_mapping = column_mapping_series.to_dict()
 
