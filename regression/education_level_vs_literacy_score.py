@@ -116,7 +116,6 @@ print("\n--- FINAL REGRESSION RESULTS (NORWAY) ---")
 print(summary)
 
 
-
 # --- PLOTTING ---
 
 # 1. Map education codes to descriptive labels
