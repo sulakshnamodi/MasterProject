@@ -1,3 +1,5 @@
+# Multiple regression with the variables reading and writing at work only.
+
 import os, sys
 import pandas as pd
 import numpy as np
@@ -22,7 +24,7 @@ with open(subdataset_filepath, 'rb') as f:
     loaded_data = pickle.load(f)
 
 subdataset_df = loaded_data['dataframe']
-independent_vars = ['EDCAT6_TC1', 'WRITWORKC2_WLE_CA', 'WRITHOMEC2_WLE_CA', 'READWORKC2_WLE_CA_T1', 'READHOMEC2_WLE_CA_T1']
+independent_vars = ['WRITWORKC2_WLE_CA', 'READWORKC2_WLE_CA_T1']
 
 
 # --- 2. PRE-REGRESSION DIAGNOSTICS ---
@@ -33,11 +35,8 @@ X_val_scaled = scaler_val.fit_transform(df_val[independent_vars])
 
 # Define readable labels 
 label_map_diag = {
-    'EDCAT6_TC1': 'Education Level',
     'WRITWORKC2_WLE_CA': 'Writing at Work',
-    'WRITHOMEC2_WLE_CA': 'Writing at Home',
-    'READWORKC2_WLE_CA_T1': 'Reading at Work',
-    'READHOMEC2_WLE_CA_T1': 'Reading at Home'
+    'READWORKC2_WLE_CA_T1': 'Reading at Work'
 }
 
 
@@ -55,6 +54,7 @@ plt.yticks(rotation=0)
 plt.tight_layout()
 plt.savefig(os.path.join(outputfolder, 'norway_correlation_heatmap.png'), dpi=300)
 plt.show()
+
 
 # B. VIF Calculation 
 X_vif_df = pd.DataFrame(X_val_scaled, columns=independent_vars)
@@ -118,11 +118,9 @@ summary['CI_upper'] = summary['Coefficient'] + (1.96 * summary['Std.Error'])
 
 # Define readable labels for the plot
 label_map = {
-    'EDCAT6_TC1': 'Highest Education Level',
     'WRITWORKC2_WLE_CA': 'Writing at Work (Index)',
-    'WRITHOMEC2_WLE_CA': 'Writing at Home (Index)',
-    'READWORKC2_WLE_CA_T1': 'Reading at Work (Index)',
-    'READHOMEC2_WLE_CA_T1': 'Reading at Home (Index)'
+    'READWORKC2_WLE_CA_T1': 'Reading at Work (Index)'
+   
 }
 summary['Variable_Label'] = summary['Variable'].map(label_map)
 
