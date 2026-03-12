@@ -4,9 +4,13 @@ Specifically contains: Literacy scores (all plausible values),
 gender, educational background, literacy use at work(readwork),
 
 
-For research question 1)How do the levels of cognitive skills (literacy, numeracy,
-problem-solving) compare between university and vocationally educated adults
+For research question 
+1)How do the levels of cognitive Literacy skills compare between university and vocationally educated adults
 at work in Norway?
+3) To what extent does intersectional group membership, based on education type, gender, socioeconomic status and migration background, account for differences in workplace
+cognitive literacy skill application among Norwegian adults? 
+
+
 '''
 import os, sys
 import pandas as pd
@@ -82,8 +86,16 @@ Parents's or Guardian's Education Variables
 PAREDC2: Highest of mother or father’s level of education (derived) 
 1: Neither parent has attained upper secondary 2: At least one parent has attained secondary and post-secondary, non-tertiary; 3: At least one parent has attained tertiary
 '''
-parents_occupation = ['PAREDC2']
+parents_education_vars = ['PAREDC2']
 
+'''
+Parents's migration status variable
+IMPARC2:Parents’ immigration status (derived)
+1: Both parents foreign-born; 2: One parent foreign-born; 3: Both parents native-born
+A2_Q03a_T: Born in Norway
+1: Yes; 2: No
+'''
+migration_status_vars =['IMPARC2', 'A2_Q03a_T'] 
 
 '''
 Sampling and Replicate Weights 
@@ -101,7 +113,7 @@ work_vars = ['ISCOSKIL4', 'D2_Q04' ]
 
 # Step3: Access the data of these variables from raw data file
 # Apply the function categorize_education to add as an extra column
-all_variables = background_vars + education_vars + literacy_scores_vars + parents_occupation + sampling_weight_vars + literacy_usage_vars + work_vars
+all_variables = background_vars + education_vars + literacy_scores_vars + parents_education_vars  + migration_status_vars + sampling_weight_vars + literacy_usage_vars + work_vars
 
 
 # Step4: Verify the new dataframe
