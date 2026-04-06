@@ -1,5 +1,4 @@
-""" RQ3: To what extent does intersectional group membership, based on education type, gender, socioeconomic status and migration background, account for differences in workplace
-cognitive literacy skill application among Norwegian adults?  """
+# RQ2: To what extent is variation in literacy and numeracy proficiency among Norwegian higher education graduates attributable to intersectional group membership (defined by education type, gender, socioeconomic background, and migration status), and is this variation primarily additive or interactive?
 import os
 os.environ['RPY2_CFFI_MODE'] = 'ABI'
 os.environ['R_HOME'] = 'C:\\Program Files\\R\\R-4.5.3'
@@ -14,11 +13,6 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 from pymer4.models import Lmer
 import statsmodels.formula.api as smf
-
-
-# RQ1: How do the levels of cognitive literacy skill compare between university and vocationally educated adults at work in Norway?
-
-
 
 # Setting of subdataset file
 subdataset_root = r'G:\My Drive\Sulakshna\Sulakshna Drive\Codes\MasterProject\data\preprocessed\subdataset1'
@@ -91,6 +85,10 @@ pv_columns = [f'PVLIT{i}' for i in range(1, 11)]
 
 main_effects = "C(GENDER_R) + C(ED_GROUP) + C(PAREDC2) + C(IMPARC2) + C(A2_Q03a_T)"    # C(...) is used to treat the varaibles as categorial (string) as we are using pymer4
 
+# Normalize the weights (Recommended for multilevel models)
+# This ensures the sum of weights equals the number of rows
+analysis_df['WGT_NORM'] = analysis_df['SPFWT0'] * (len(analysis_df) / analysis_df['SPFWT0'].sum())
+
 # Storing the results
 all_vpcs = []
 all_pcvs = []
@@ -99,57 +97,94 @@ all_main_effects = []
 print("Starting MAIHDA iterations across 10 Plausible Values...")
 
 for pv in pv_columns:
-    """  --- MODEL 1: Null Model ---
-     Formula: Outcome ~ 1 + (1 | Group), ~ = "Is predicted by..." (literacy score PV is predicted by Grand Mean + the group deviation)
-     1 + (1 | intersectional_id), 1: The grand mean, (1 | intersectional_id): the group deviation
-     e.g. Grand mean: 250, Group A mean: 230, 1 + (1 | intersectional_id) = 250 + (-20) = 230 """
-    
-    # Initialising and fitting the model
+    # --- MODEL 1: Null Model (Weighted) ---
     model_null = Lmer(f"{pv} ~ 1 + (1 | intersectional_id)", data=analysis_df) 
-    model_null.fit(summarize=False)     # this is where actual regression happens
+    
+    # Pass the normalized weight column to the fit method
+    model_null.fit(weights="WGT_NORM", summarize=False) 
 
-    # Extract variance components for Model 1 (Null)
-    # var_between_null: Sigma squared u (Between-strata variance)
-    var_between_null = float(model_null.ranef_var.iloc[0, 1])
+    # Robust Variance Extraction
+    # .ranef_var is a DataFrame: the first row is usually your random effect
+    var_between_null = float(model_null.ranef_var.iloc[0, 1]) 
     
-    # var_resid_null: Sigma squared e (Within-strata / Residual variance)
-    # Calculate variance from the residuals since .sig2 is missing
-    var_resid_null = float(model_null.residuals.var())
+    # Residual variance is often stored in .sig2 in pymer4
+    # If .sig2 isn't available, we use the squared standard deviation of residuals
+    var_resid_null = getattr(model_null, 'sig2', np.var(model_null.residuals))
     
-    # Calculate VPC (Variance Partition Coefficient)
-    
+    # Calculate VPC
     vpc = var_between_null / (var_between_null + var_resid_null)
     all_vpcs.append(vpc)
     
-    # --- MODEL 2: Main Effects Model ---
-    model_main = Lmer(f"{pv} ~ {main_effects} + (1 | intersectional_id)", data=analysis_df)
-    model_main.fit(summarize=False)
+    # --- MODEL 2: Main Effects Model (Weighted) ---
+    # We use the categorical wrapper C() for R-style factors
+    model_main = Lmer(f"{pv} ~ C(GENDER_R) + C(ED_GROUP) + C(PAREDC2) + C(IMPARC2) + C(A2_Q03a_T) + (1 | intersectional_id)", data=analysis_df)
+    
+    # Pass the normalized weight column to the fit method
+    model_main.fit(weights="WGT_NORM", summarize=False)
     
     var_between_main = float(model_main.ranef_var.iloc[0, 1])
     
     # Calculate PCV (Proportional Change in Variance)
+    # If var_between_main is very close to 0, PCV will approach 1.0 (100%)
     pcv = (var_between_null - var_between_main) / var_between_null
     all_pcvs.append(pcv)
     
-    # Save fixed effects for pooling
+    # Save coefficients for pooling
     all_main_effects.append(model_main.coefs)
 
 # --- FINAL POOLING ---
 avg_vpc = np.mean(all_vpcs)
 avg_pcv = np.mean(all_pcvs)
 
-print(f"\n--- INTERSECTIONAL RESULTS ---")
-print(f"Average VPC: {avg_vpc:.2%} (Total variance due to intersectional strata)")
-print(f"Average PCV: {avg_pcv:.2%} (Proportion of strata variance explained by main effects)")
+print(f"\n--- WEIGHTED INTERSECTIONAL RESULTS ---")
+print(f"Average VPC: {avg_vpc:.2%} (Total variance due to intersectional position)")
+print(f"Average PCV: {avg_pcv:.2%} (Proportion explained by additive main effects)")
 
-# Combine fixed effects coefficients (Mean of estimates)
+# Combine fixed effects coefficients
 final_coefs = pd.concat(all_main_effects).groupby(level=0).mean(numeric_only=True)
-print("\n--- POOLED FIXED EFFECTS (Main Effects) ---")
+print("\n--- POOLED FIXED EFFECTS (Weighted) ---")
 print(final_coefs[['Estimate', 'P-val']])
 
 
+# --- VISUALIZATION: THE INTERSECTIONAL HIERARCHY (RQ2) ---
 
+# 1. Calculate the mean of ALL 10 PVs for each person first
+analysis_df['PV_AVG'] = analysis_df[pv_columns].mean(axis=1)
 
+# 2. Group by strata and get the mean proficiency
+plot_df = analysis_df.groupby('intersectional_id').agg({
+    'PV_AVG': 'mean',
+    'ED_GROUP': 'first' # Keep 0=Univ, 1=Voc
+}).reset_index()
+
+# 3. Create Human-Readable Labels (Optional but highly recommended)
+# This replaces the "0.0_1.0_..." strings with actual names for the chart
+def label_strata(row):
+    parts = row['intersectional_id'].split('_')
+    edu = "Univ" if parts[0] == '0.0' else "Voc"
+    gen = "Male" if parts[1] == '1.0' else "Fem"
+    ses = f"SES-{parts[2][0]}" # SES-1, SES-2, SES-3
+    mig = "Native" if parts[4] == '1.0' else "Abroad"
+    return f"{edu}-{gen}-{ses}-{mig}"
+
+plot_df['label'] = plot_df.apply(label_strata, axis=1)
+plot_df = plot_df.sort_values('PV_AVG', ascending=False)
+plot_df = plot_df[plot_df['PV_AVG'] > 0]
+
+# 4. Plotting
+plt.figure(figsize=(10, 12))
+colors = {0.0: "steelblue", 1.0: "indianred"}
+palette = [colors[x] for x in plot_df['ED_GROUP']]
+
+sns.barplot(x='PV_AVG', y='label', data=plot_df, hue='ED_GROUP', dodge=False, palette=colors)
+
+plt.axvline(analysis_df['PV_AVG'].mean(), color='black', linestyle='--', label='Norway HE Average')
+plt.title('Ranked Proficiency by Intersectional Strata (Norway PIAAC 2023)', fontsize=14)
+plt.xlabel('Average Literacy Score (Pooled PVs 1-10)')
+plt.ylabel('Intersectional Group')
+plt.xlim(240, 340) # Focus on the relevant range
+plt.tight_layout()
+plt.show()
 
 
 
