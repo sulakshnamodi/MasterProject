@@ -66,7 +66,7 @@ VETC2:Respondent’s highest level of education is vocationally oriented (derive
 education_vars = ['EDCAT6_TC1', 'VET_TC1', 'VETC2']
 
 '''
-Cognitive Skills Variables
+Cognitive Literacy Skill Variables
 PVLIT (PVLIT1: Literacy scale score - Plausible value 1 to PVLIT10): 
 Note: Taking all 10 values for valid statistical inference
 '''

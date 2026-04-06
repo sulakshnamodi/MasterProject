@@ -108,6 +108,9 @@ df_clean['Edu_Type'] = df_clean[key_variable].map({0: 'University', 1: 'Vocation
 pv_cols = ['PVLIT' + str(i) for i in range(1, 11)]
 df_clean['Mean_PVLIT'] = df_clean[pv_cols].mean(axis=1)
 
+print('Mean literacy score for University:', df_clean[df_clean['Edu_Type'] == 'University']['Mean_PVLIT'].mean())
+print('Mean literacy score for Vocational:', df_clean[df_clean['Edu_Type'] == 'Vocational']['Mean_PVLIT'].mean())
+
 plt.figure(figsize=(10, 7))
 sn.set_palette("Dark2")
 
@@ -140,3 +143,4 @@ plt.legend(frameon=False)
 plt.tight_layout()
 plt.savefig(os.path.join(outputfolder, f'norway_{key_variable.lower()}_literacy_violin.png'), dpi=300)
 plt.show()
+
