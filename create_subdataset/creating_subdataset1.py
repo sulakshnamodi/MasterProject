@@ -3,14 +3,6 @@ File for creating a subdataset from PIAAC Norway.
 Specifically contains: Literacy scores (all plausible values), 
 gender, educational background, literacy use at work(readwork),
 
-
-For research question 
-1)How do the levels of cognitive Literacy skills compare between university and vocationally educated adults
-at work in Norway?
-3) To what extent does intersectional group membership, based on education type, gender, socioeconomic status and migration background, account for differences in workplace
-cognitive literacy skill application among Norwegian adults? 
-
-
 '''
 import os, sys
 import pandas as pd
@@ -46,12 +38,8 @@ Population Variables
 CNTRYID: Country ID, 578 is Norway
 GENDER_R: Person gender
     1: Male; 2: Female
-C2_D05:Current Employment status (devrived)
-    1: Employed; 2: Unemployed; 3: Out of the labour force; 4: Not known 
-PAIDWORK12: Adults who have had paid work during the 12 months preceding the survey (derived), 
-    0: Has not had paid work during the 12 months preceding the survey; 1: Has had paid work during the 12 months preceding the survey
 '''
-background_vars = ['CNTRYID', 'GENDER_R', 'C2_D05', 'PAIDWORK12']
+background_vars = ['CNTRYID', 'GENDER_R']
 
 
 '''
@@ -103,17 +91,9 @@ SPFWT0 is the final full sample weight; SPFWT1-80 are replicate weights
 '''
 sampling_weight_vars = ['SPFWT0'] + [f'SPFWT{i}' for i in range(1, 81)]
 
-
-'''
-Work-Related Variables
-ISCOSKIL4: Occupational classification of respondent's job (4 skill based categories), last or current (derived)
-D2_Q04:Current work - Employee or self-employed
-'''
-work_vars = ['ISCOSKIL4', 'D2_Q04' ]
-
 # Step3: Access the data of these variables from raw data file
 # Apply the function categorize_education to add as an extra column
-all_variables = background_vars + education_vars + literacy_scores_vars + parents_education_vars  + migration_status_vars + sampling_weight_vars + literacy_usage_vars + work_vars
+all_variables = background_vars + education_vars + literacy_scores_vars + parents_education_vars  + migration_status_vars + sampling_weight_vars + literacy_usage_vars
 
 
 # Step4: Verify the new dataframe
@@ -134,7 +114,7 @@ for col in all_variables:
 # Group 1: Vocational (VETC2 is 1)
 
 def categorize_education(row):
-    # Vocational (VETC2 is 1)
+    # Group 1: Vocational Higher Education ()
     if row['VETC2'] == 1:
         return 1 
     # University (Non-vocational AND Level 5 or 6)
@@ -178,14 +158,39 @@ print(f"Data saved to CSV: {output_csv_path}")
 # Save to Pickle (pkl) as the data type is preserved as float
 # Saving the dictionary containing both the dataframe and the mapping
 description = """
-Origin & Scope: This sub-dataset is generated from the PIAAC Cycle 2 (2023) International Survey, specifically filtered for the Norwegian target population (CNTRYID 578). 
-Cognitive Skills: Includes 10 Plausible Values for Literacy (PVLIT1 to PVLIT10), used as the primary outcome measures for adult proficiency.
-Education Background: Contains the highest level of formal education (EDCAT6) and vocational orientation flags (VET_TC1 or VET_TC2) to distinguish between academic and practical training.
-Skill Use Indices: Includes Weighted Likelihood Estimates (WLE) for the frequency of reading and writing skills used both at work (READWORK, WRITWORK) and at home (READHOME, WRITHOME).
-Labor Market Status: Captures the respondent’s current employment status (C_D05), occupational classification (ISCO1L or ISCOSKILL4), and work history.
-Statistical Weights: Features the final full-sample weight (SPFWT0) and 80 replicate weights (SPFWT1 to SPFWT80) necessary for calculating accurate population estimates and standard errors.
-Research Objective: This data is designed to examine cognitive skill gaps between university-educated and vocationally-educated adults within the Norwegian labor market.
+SUB-DATASET PROFILE: Intersectional Analysis of Cognitive Skills (PIAAC 2023 - Norway)
+
+1. ORIGIN & POPULATION: 
+Derived from PIAAC Cycle 2 (2023). Filtered for Norway (CNTRYID 578). Specifically 
+targets higher education graduates, comparing Tertiary Professional/Vocational (ISCED 5B) 
+with University Bachelor/Master (ISCED 5A/6).
+
+2. RESEARCH SCOPE & NARRATIVE:
+- RQ1 (Descriptive Foundation): Mapping differences in proficiency, demographics, and 
+  workplace skill use between Tertiary Professional (EDCAT6_TC1=4) and 
+  University (EDCAT6_TC1=5,6) pathways.
+- RQ2 (Intersectional MAIHDA): Applying Multilevel Analysis of Individual Heterogeneity 
+  and Discriminatory Accuracy to determine if proficiency variation is additive or 
+  interactive across intersectional strata (Education × Gender × SES × Migration).
+- RQ3 (Mechanism: Testing if workplace cognitive skill use (READWORK/WRITWORK) 
+  explains residual proficiency variation across intersectional groups.
+
+3. KEY CONSTRUCTS & STRATA DEFINITION:
+- Outcome: 10 Plausible Values for Literacy (PVLIT1-10).
+- Intersectional Strata: Defined by Education Type (ED_GROUP), Gender (GENDER_R), 
+  Socioeconomic Status (PAREDC2), and Migration Background (IMPARC2/A2_Q03a_T).
+- Workplace Mechanism: Skill use indices (READWORK/WRITWORK)
+
+4. WEIGHTING & ESTIMATION: 
+Contains SPFWT0 (final sample weight) and 80 replicate weights (SPFWT1-80). 
+Crucial for accurate population-level inferences in the MAIHDA multilevel context.
+
+5. PRE-PROCESSING: 
+Cleaned numeric variables (NaN handling for '.' and -9). Custom 'ED_GROUP' logic:
+  - ED_GROUP 1 (Vocational): VETC2 == 1
+  - ED_GROUP 0 (University): VETC2 == 0 AND EDCAT6_TC1 is 5 or 6 (ISCED 97 5A/6)
 """
+
 
 # To see it formatted exactly as above:
 print(description)
