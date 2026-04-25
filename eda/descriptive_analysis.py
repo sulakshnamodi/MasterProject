@@ -11,6 +11,9 @@ import pickle
 import matplotlib.pyplot as plt
 import seaborn as sns
 import statsmodels.formula.api as smf
+from sklearn.ensemble import RandomForestClassifier
+from sklearn.model_selection import train_test_split
+from sklearn.metrics import classification_report, accuracy_score
 
 # --- DATA LOADING ---
 subdataset_root = r'G:\My Drive\Sulakshna\Sulakshna Drive\Codes\MasterProject\data\preprocessed\subdataset1'
@@ -21,6 +24,15 @@ with open(subdataset_filepath, 'rb') as f:
     loaded_data = pickle.load(f)
 
 df = loaded_data['dataframe'].copy()
+
+# Define the variables required for the RQ3 workplace model
+required_vars = ['ED_GROUP', 'GENDER_R', 'PAREDC2', 'IMPARC2', 'A2_Q03a_T', 
+                 'READWORKC2_WLE_CA_T1', 'WRITWORKC2_WLE_CA']
+
+# Filter the dataframe to match the RQ3 sample (Complete Case Analysis)
+df = df.dropna(subset=required_vars).copy()
+
+print(f"Analytical sample size is now: {len(df)}")
 
 # Ensure we have a normalized weight for the regression models
 df['WGT_NORM'] = df['SPFWT0'] * (len(df) / df['SPFWT0'].sum())
@@ -95,6 +107,40 @@ print("\n" + "="*45)
 print("SIGNIFICANCE OF GROUP DIFFERENCES")
 print("="*45)
 print(sig_df)
+
+# ... [Keep your existing Section 2: Statistical Significance Testing] ...
+
+# SECTION 2.5 EXPLORATORY MACHINE LEARNING 
+# This demonstrates how social background factors predict education track
+print("\n" + "="*45)
+print("EXPLORATORY ML: PREDICTING EDUCATION TRACK")
+print("="*45)
+
+features = ['GENDER_R', 'PAREDC2', 'A2_Q03a_T'] 
+X = df[features]
+y = df['ED_GROUP']
+
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.3, random_state=42)
+rf = RandomForestClassifier(n_estimators=100, random_state=42, class_weight='balanced')
+rf.fit(X_train, y_train)
+
+importances = pd.DataFrame({'Feature': features, 'Importance': rf.feature_importances_})
+print(importances.sort_values(by='Importance', ascending=False))
+
+preds = rf.predict(X_test)
+print(f"\nPrediction Accuracy: {accuracy_score(y_test, preds):.2f}")
+
+# Create a visualization for the ML results
+imp_plot_data = importances.sort_values(by='Importance', ascending=True)
+
+plt.figure(figsize=(8, 4))
+plt.barh(imp_plot_data['Feature'], imp_plot_data['Importance'], color='gray')
+plt.title('Predictive Importance of Background Factors for HE Track')
+plt.xlabel('Gini Importance')
+plt.grid(axis='x', linestyle='--', alpha=0.7)
+plt.tight_layout()
+plt.show()
+
 
 # --- 3. VISUALIZATION ---
 plot_data = table_1.drop(['Sample N', 'Mean Literacy (PV)'], axis=1).reset_index()

@@ -1,4 +1,4 @@
-# RQ2: To what extent is variation in literacy and numeracy proficiency among Norwegian higher education graduates attributable to intersectional group membership (defined by education type, gender, socioeconomic background, and migration status), and is this variation primarily additive or interactive?
+# RQ2: To what extent is variation in literacy among Norwegian higher education graduates attributable to intersectional group membership (defined by education type, gender, socioeconomic background, and migration status), and is this variation primarily additive or interactive?
 import os
 os.environ['RPY2_CFFI_MODE'] = 'ABI'
 os.environ['R_HOME'] = 'C:\\Program Files\\R\\R-4.5.3'
@@ -30,6 +30,8 @@ subdataset_df = loaded_data['dataframe']
 # Drop rows with missing values in your intersectional anchors
 anchors = ['ED_GROUP', 'GENDER_R', 'PAREDC2', 'IMPARC2', 'A2_Q03a_T']
 analysis_df = subdataset_df.dropna(subset=anchors).copy()
+
+print(f"Analytical sample size for RQ2 is now: {len(analysis_df)}")
 
 for col in analysis_df.columns:
     if col not in anchors:
