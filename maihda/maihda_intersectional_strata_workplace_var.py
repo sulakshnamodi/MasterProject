@@ -32,11 +32,14 @@ with open(subdataset_filepath, 'rb') as f:
 
 analysis_df = loaded_data['dataframe'].copy()
 
+
 # --- PRE-PROCESSING & STRATA CREATION ---
 anchors = ['ED_GROUP', 'GENDER_R', 'PAREDC2', 'IMPARC2', 'A2_Q03a_T']
 # We also drop missing workplace variables for RQ3 consistency
 workplace_vars = ['READWORKC2_WLE_CA_T1', 'WRITWORKC2_WLE_CA']
 analysis_df = analysis_df.dropna(subset=anchors + workplace_vars).copy()
+
+print(f"Analytical sample size for RQ2 is now: {len(analysis_df)}")
 
 # Create Intersectional ID
 analysis_df['intersectional_id'] = (
