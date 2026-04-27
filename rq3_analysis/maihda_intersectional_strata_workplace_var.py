@@ -4,7 +4,7 @@ import sys
 # 1. SET ENVIRONMENT VARIABLES FIRST
 # Make sure these paths are 100% correct for your machine
 os.environ['R_HOME'] = r'C:\Program Files\R\R-4.5.3'
-# Adding both the bin and the x64 bin to PATH
+os.environ['R_LIBS_USER'] = r'C:\Users\brind\AppData\Local\R\win-library\4.5'
 os.environ['PATH'] = r'C:\Program Files\R\R-4.5.3\bin\x64;' + os.environ['PATH']
 
 # 2. NOW IMPORT PYMER4
