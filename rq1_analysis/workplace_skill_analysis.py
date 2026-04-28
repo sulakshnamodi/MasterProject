@@ -25,8 +25,9 @@ df = loaded_data['dataframe'].copy()
 # -----------------------------------------------------------------------------
 # 2. CLEANING, FILTERING & STANDARDIZATION
 # -----------------------------------------------------------------------------
+anchors = ['ED_GROUP', 'GENDER_R', 'PAREDC2', 'A2_Q03a_T', 'IMPARC2']
 workplace_vars = ['READWORKC2_WLE_CA_T1', 'WRITWORKC2_WLE_CA']
-df = df.dropna(subset=['ED_GROUP', 'SPFWT0'] + workplace_vars).copy()
+df = df.dropna(subset=anchors + ['SPFWT0'] + workplace_vars).copy()
 
 # Standardize Workplace Variables (Z-scores) - matching user logic
 df['READ_Z'] = zscore(df['READWORKC2_WLE_CA_T1'])

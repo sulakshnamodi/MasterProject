@@ -1,5 +1,5 @@
 import pickle
-import os
+import os, sys
 
 subdataset_root = r'G:\My Drive\Sulakshna\Sulakshna Drive\Codes\MasterProject\data\preprocessed\subdataset1'
 subdataset_filepath = os.path.join(subdataset_root, 'piaac_norway_subdataset1.pkl')
@@ -8,7 +8,7 @@ with open(subdataset_filepath, 'rb') as f:
     loaded_data = pickle.load(f)
 
 df = loaded_data['dataframe'].copy()
-anchors = ['ED_GROUP', 'GENDER_R', 'PAREDC2', 'A2_Q03a_T']
+anchors = ['ED_GROUP', 'GENDER_R', 'PAREDC2', 'A2_Q03a_T', 'IMPARC2']
 df = df.dropna(subset=anchors + ['SPFWT0']).copy()
 
 total_w = df['SPFWT0'].sum()
