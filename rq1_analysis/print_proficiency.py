@@ -14,7 +14,7 @@ df = loaded_data['dataframe'].copy()
 pv_cols = [f'PVLIT{i}' for i in range(1, 11)]
 df['AVG_LIT'] = df[pv_cols].mean(axis=1)
 
-anchors = ['ED_GROUP', 'GENDER_R', 'PAREDC2', 'A2_Q03a_T']
+anchors = ['ED_GROUP', 'GENDER_R', 'PAREDC2', 'A2_Q03a_T', 'IMPARC2']
 df = df.dropna(subset=anchors + ['SPFWT0', 'AVG_LIT']).copy()
 
 mapping_config = {

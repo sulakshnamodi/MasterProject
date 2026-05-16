@@ -120,6 +120,9 @@ for i, col in enumerate(demographics):
         zorder=3
     )
     
+    for c in ax.containers:
+        ax.bar_label(c, fmt='%.1f%%', padding=3, fontsize=10)
+    
     # Styling copied from mean_literacy_by_strata.py
     ax.tick_params(axis='x', labelsize=14)
     ax.tick_params(axis='y', labelsize=14)
@@ -171,6 +174,9 @@ ax_inter = sns.barplot(
     order=top_strata,
     zorder=3
 )
+
+for c in ax_inter.containers:
+    ax_inter.bar_label(c, fmt='%.1f%%', padding=3, fontsize=11)
 
 plt.tick_params(axis='both', labelsize=14)
 plt.title('Top 10 Intersectional Strata Across Tracks\n(Gender - Migration - SES)', fontsize=14, pad=10)

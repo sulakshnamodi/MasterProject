@@ -8,7 +8,7 @@ with open(subdataset_filepath, 'rb') as f:
     loaded_data = pickle.load(f)
 
 df = loaded_data['dataframe'].copy()
-anchors = ['ED_GROUP', 'GENDER_R', 'PAREDC2', 'A2_Q03a_T']
+anchors = ['ED_GROUP', 'GENDER_R', 'PAREDC2', 'A2_Q03a_T', 'IMPARC2']
 df = df.dropna(subset=anchors + ['SPFWT0']).copy()
 
 def create_intersectional_label(row):
