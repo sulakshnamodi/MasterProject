@@ -25,7 +25,7 @@ from scipy.stats import norm
 # 1. PATH CONFIGURATION & DATA EXTRACTION
 subdataset_root = r'G:\My Drive\Sulakshna\Sulakshna Drive\Codes\MasterProject\data\preprocessed\subdataset1'
 subdataset_filepath = os.path.join(subdataset_root, 'piaac_norway_subdataset1.pkl')
-outputfolder = r'G:\My Drive\Sulakshna\Sulakshna Drive\Codes\MasterProject\results\maihda'
+outputfolder = r'G:\My Drive\Sulakshna\Sulakshna Drive\Codes\MasterProject\results\rq2'
 os.makedirs(outputfolder, exist_ok=True)
 
 with open(subdataset_filepath, 'rb') as f:
@@ -57,6 +57,8 @@ counts = analysis_df['intersectional_id'].value_counts()
 valid_ids = counts[counts >= 5].index
 analysis_df = analysis_df[analysis_df['intersectional_id'].isin(valid_ids)]
 print("Total unique non-empty strata analyzed:", analysis_df['intersectional_id'].nunique())
+
+print(analysis_df.shape)
 
 all_blups = []
 all_vars = []
@@ -111,7 +113,8 @@ def label_strata(strata_id):
     parts = strata_id.split('_')
     edu = "Univ" if parts[0] == '0.0' else "Voc"
     gen = "Male" if parts[1] == '1.0' else "Fem"
-    ses = f"SES-{parts[2][0]}"
+    ses_map = {'1': 'Low', '2': 'Med', '3': 'High'}
+    ses = ses_map.get(parts[2][0], 'Low')
     
     if parts[3] == '3.0':
         par = "ParNat"
@@ -170,12 +173,13 @@ legend_elements = [
     Line2D([0], [0], marker='o', color='w', markerfacecolor='#e74c3c', markersize=9, markeredgecolor='white', label='Significant Interaction'),
     Line2D([0], [0], marker='o', color='w', markerfacecolor='#2c3e50', markersize=9, markeredgecolor='white', label='Non-Significant (Purely Additive)')
 ]
-plt.legend(handles=legend_elements, bbox_to_anchor=(0.5, -0.15), loc='upper center', borderaxespad=0., ncol=2, fontsize=11, frameon=True, facecolor='#ffffff', edgecolor='#dddddd')
+plt.legend(handles=legend_elements, bbox_to_anchor=(0.5, -0.15), loc='upper center', borderaxespad=0., ncol=2, fontsize=14, frameon=True, facecolor='#ffffff', edgecolor='#dddddd')
 
-plt.yticks(y_pos, caterpillar_df['label'], fontsize=11, fontname='Times New Roman')
-plt.xlabel('Intersectional Deviation (Random Effect Residuals)', fontsize=12, fontname='Times New Roman', labelpad=12)
-plt.ylabel('Intersectional Cohort Profiles', fontsize=12, fontname='Times New Roman', labelpad=12)
-plt.title('MAIHDA Caterpillar Plot: Testing for Intersectional Interactions', fontsize=14, weight='bold', fontname='Times New Roman', pad=20)
+plt.yticks(y_pos, caterpillar_df['label'], fontsize=14, fontname='Times New Roman')
+plt.xticks(fontsize=14, fontname='Times New Roman')
+plt.xlabel('Intersectional Deviation (Random Effect Residuals)', fontsize=16, fontname='Times New Roman', labelpad=12, weight='bold')
+plt.ylabel('Intersectional Cohort Profiles', fontsize=16, fontname='Times New Roman', labelpad=12, weight='bold')
+plt.title('MAIHDA Caterpillar Plot: Testing for Intersectional Interactions', fontsize=16, weight='bold', fontname='Times New Roman', pad=20)
 plt.grid(axis='x', linestyle='--', alpha=0.5)
 
 caterpillar_out = os.path.join(outputfolder, 'rq2_maihda_caterpillar.csv')

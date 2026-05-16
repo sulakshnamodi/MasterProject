@@ -39,7 +39,8 @@ def label_strata(row):
     parts = row['intersectional_id'].split('_')
     edu = "Univ" if parts[0] == '0.0' else "Voc"
     gen = "Male" if parts[1] == '1.0' else "Fem"
-    ses = f"SES-{parts[2][0]}"
+    ses_map = {'1': 'Low', '2': 'Med', '3': 'High'}
+    ses = ses_map.get(parts[2][0], 'Low')
     mig = "Native" if parts[4] == '1.0' else "Abroad"
     par_mig = "Both-FB" if parts[3] == '1.0' else ("One-FB" if parts[3] == '2.0' else "Both-NB")
     return f"{edu}-{gen}-{ses}-{par_mig}-{mig}"
@@ -91,7 +92,7 @@ for idx, row in res.iterrows():
     ax.text(x_coords[4], y + 0.3, str(row['N_Students']), fontsize=11, fontname='Times New Roman', color='black', ha='center', va='center')
 
 plt.suptitle("Table 2.1: Intersectional Group Proficiency Ranks", fontname='Times New Roman', fontsize=13, weight='bold', y=0.96)
-output_dir = r'G:\My Drive\Sulakshna\Sulakshna Drive\Codes\MasterProject\results\maihda'
+output_dir = r'G:\My Drive\Sulakshna\Sulakshna Drive\Codes\MasterProject\results\rq2'
 os.makedirs(output_dir, exist_ok=True)
 out_path = os.path.join(output_dir, 'rq2_strata_table.png')
 

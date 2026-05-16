@@ -151,6 +151,9 @@ ax.bar(x_pos, means, yerr=sems, width=0.6, capsize=5,
        color=[COLOR_CONFIG['Academic'], COLOR_CONFIG['Vocational']], 
        edgecolor='black', zorder=3, error_kw={'elinewidth':1.2})
 
+for i, v in enumerate(means):
+    ax.text(i, v - 15, f"{v:.1f}", ha='center', va='top', color='white', weight='bold', fontsize=14)
+
 ax.set_xticks(x_pos)
 ax.set_xticklabels(tracks, fontsize=14)
 ax.tick_params(axis='y', labelsize=14)
@@ -203,6 +206,12 @@ for idx, col in enumerate(demographics):
     ax.bar(x_pos + bar_width/2, voc_means, width=bar_width, yerr=voc_sems, capsize=5, 
            color=COLOR_CONFIG['Vocational'], edgecolor='black', zorder=3, 
            error_kw={'elinewidth':1.2}, label='Vocational')
+
+    for cat_idx in range(len(categories)):
+        if acad_means[cat_idx] > 0:
+            ax.text(cat_idx - bar_width/2, acad_means[cat_idx] - 15, f"{acad_means[cat_idx]:.0f}", ha='center', va='top', color='white', weight='bold', fontsize=11)
+        if voc_means[cat_idx] > 0:
+            ax.text(cat_idx + bar_width/2, voc_means[cat_idx] - 15, f"{voc_means[cat_idx]:.0f}", ha='center', va='top', color='white', weight='bold', fontsize=11)
            
     # Draw significance brackets for each category
     for cat_idx, cat in enumerate(categories):

@@ -9,7 +9,7 @@ import pickle
 # -----------------------------------------------------------------------------
 subdataset_root = r'G:\My Drive\Sulakshna\Sulakshna Drive\Codes\MasterProject\data\preprocessed\subdataset1'
 subdataset_filepath = os.path.join(subdataset_root, 'piaac_norway_subdataset1.pkl')
-output_dir = r'G:\My Drive\Sulakshna\Sulakshna Drive\Codes\MasterProject\rq1_analysis'
+output_dir = r'G:\My Drive\Sulakshna\Sulakshna Drive\Codes\MasterProject\results\rq1'
 
 os.makedirs(output_dir, exist_ok=True)
 
@@ -17,8 +17,14 @@ with open(subdataset_filepath, 'rb') as f:
     loaded_data = pickle.load(f)
 
 df = loaded_data['dataframe'].copy()
-anchors = ['ED_GROUP', 'GENDER_R', 'PAREDC2', 'A2_Q03a_T', 'IMPARC2']
-df = df.dropna(subset=anchors + ['SPFWT0']).copy()
+anchors = ['ED_GROUP', 'GENDER_R', 'PAREDC2', 'IMPARC2', 'A2_Q03a_T']
+work = ['READWORKC2_WLE_CA_T1', 'WRITWORKC2_WLE_CA']
+df = df.dropna(subset=anchors + work + ['SPFWT0']).copy()
+
+df['intersectional_id'] = df['ED_GROUP'].astype(str) + '_' + df['GENDER_R'].astype(str) + '_' + df['PAREDC2'].astype(str) + '_' + df['IMPARC2'].astype(str) + '_' + df['A2_Q03a_T'].astype(str)
+counts = df['intersectional_id'].value_counts()
+valid_ids = counts[counts >= 5].index
+df = df[df['intersectional_id'].isin(valid_ids)].copy()
 
 # -----------------------------------------------------------------------------
 # 2. DEFINE PLOTTING FUNCTION
@@ -112,7 +118,7 @@ def generate_track_pyramid(track_val, track_name, track_color, filename):
                         lbl = f"{f*100:.1f}%"
                         
                     ax.text(center_x, y_val, lbl, ha='center', va='center', 
-                            color=txt_color, fontsize=max(7, 11 - idx), weight='bold', zorder=4)
+                            color=txt_color, fontsize=max(10, 14 - idx), weight='bold', zorder=4)
                     
                 start_x += w + gap_w
                 
@@ -144,10 +150,10 @@ def generate_track_pyramid(track_val, track_name, track_color, filename):
         mpatches.Patch(color='#81b29a', label='Native-Born'),
         mpatches.Patch(color='#f2cc8f', label='Foreign-Born')
     ]
-    ax.legend(handles=legend_patches, loc='lower center', bbox_to_anchor=(0.5, -0.15), ncol=4, fontsize=11, frameon=False)
+    ax.legend(handles=legend_patches, loc='lower center', bbox_to_anchor=(0.5, -0.08), ncol=4, fontsize=13, frameon=False)
     
     ax.set_xlim(-65, 55)
-    ax.set_ylim(-0.8, 3.0)
+    ax.set_ylim(-0.4, 3.0)
     ax.axis('off')
     
     plt.suptitle(f"Hierarchical Flow: {track_name} Sample Pathway", fontsize=17, weight='bold', y=0.96)

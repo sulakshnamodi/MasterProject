@@ -14,6 +14,7 @@ df = df.dropna(subset=anchors + ['SPFWT0']).copy()
 total_w = df['SPFWT0'].sum()
 
 print(f"Total Analytical Sample: N={len(df)} (100.0%)")
+sys.exit()
 
 print("\n--- LEVEL 1: TRACK ---")
 for t_val, t_lbl in {0.0: "Academic", 1.0: "Vocational"}.items():

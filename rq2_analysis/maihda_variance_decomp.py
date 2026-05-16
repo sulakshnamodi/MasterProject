@@ -21,7 +21,7 @@ os.environ['PATH'] = r'C:\Program Files\R\R-4.5.3\bin\x64;' + os.environ['PATH']
 # Point scripts to internal workspace folders ensuring reproducible pipeline outcomes.
 subdataset_root = r'G:\My Drive\Sulakshna\Sulakshna Drive\Codes\MasterProject\data\preprocessed\subdataset1'
 subdataset_filepath = os.path.join(subdataset_root, 'piaac_norway_subdataset1.pkl')
-outputfolder = r'G:\My Drive\Sulakshna\Sulakshna Drive\Codes\MasterProject\results\maihda'
+outputfolder = r'G:\My Drive\Sulakshna\Sulakshna Drive\Codes\MasterProject\results\rq2'
 os.makedirs(outputfolder, exist_ok=True)
 
 with open(subdataset_filepath, 'rb') as f:
@@ -109,25 +109,25 @@ ax.spines['right'].set_visible(False)
 ax.spines['bottom'].set_linewidth(2)
 ax.spines['left'].set_linewidth(2)
 ax.grid(axis='y', linestyle='--', alpha=0.6, zorder=0)
-ax.tick_params(axis='x', labelsize=14)
-ax.tick_params(axis='y', labelsize=14)
+ax.tick_params(axis='x', labelsize=16)
+ax.tick_params(axis='y', labelsize=16)
 
-ax.set_ylabel('Percentage of Variance (%)', fontsize=14, fontweight='bold')
-ax.set_title('MAIHDA Variance Decomposition Stacked Profile', fontsize=16, fontweight='bold', pad=20)
+ax.set_ylabel('Percentage of Variance (%)', fontsize=18, fontweight='bold')
+ax.set_title('MAIHDA Variance Decomposition Stacked Profile', fontsize=18, fontweight='bold', pad=20)
 ax.set_ylim(0, 105)
-ax.legend(loc='upper center', bbox_to_anchor=(0.5, -0.15), ncol=1, frameon=True, facecolor='whitesmoke', edgecolor='gray')
+ax.legend(loc='upper center', bbox_to_anchor=(0.5, -0.25), ncol=1, frameon=True, facecolor='whitesmoke', edgecolor='gray', fontsize=14)
 
 # Annotations
 # Bar A
-ax.text(0, (avg_vpc * 100) / 2, f"{avg_vpc * 100:.1f}%", ha='center', va='center', color='white', fontweight='bold', fontsize=11)
-ax.text(0, (avg_vpc * 100) + ((1 - avg_vpc) * 100) / 2, f"{(1 - avg_vpc) * 100:.1f}%", ha='center', va='center', color='black', fontweight='bold', fontsize=11)
+ax.text(0, (avg_vpc * 100) / 2, f"{avg_vpc * 100:.1f}%", ha='center', va='center', color='white', fontweight='bold', fontsize=15)
+ax.text(0, (avg_vpc * 100) + ((1 - avg_vpc) * 100) / 2, f"{(1 - avg_vpc) * 100:.1f}%", ha='center', va='center', color='black', fontweight='bold', fontsize=15)
 
 # Bar B
-ax.text(1, vis_main / 2, f"{avg_pcv * 100:.1f}%", ha='center', va='center', color='white', fontweight='bold', fontsize=11)
+ax.text(1, vis_main / 2, f"{avg_pcv * 100:.1f}%", ha='center', va='center', color='white', fontweight='bold', fontsize=15)
 if (1 - avg_pcv) * 100 < 5:
-    ax.text(1, vis_main + (vis_residual / 2), f"{(1 - avg_pcv) * 100:.1f}%", ha='center', va='center', color='white', fontweight='bold', fontsize=11)
+    ax.text(1, vis_main + (vis_residual / 2), f"{(1 - avg_pcv) * 100:.1f}%", ha='center', va='center', color='white', fontweight='bold', fontsize=15)
 else:
-    ax.text(1, (avg_pcv * 100) + ((1 - avg_pcv) * 100) / 2, f"{(1 - avg_pcv) * 100:.1f}%", ha='center', va='center', color='black', fontweight='bold', fontsize=11)
+    ax.text(1, (avg_pcv * 100) + ((1 - avg_pcv) * 100) / 2, f"{(1 - avg_pcv) * 100:.1f}%", ha='center', va='center', color='black', fontweight='bold', fontsize=15)
 
 plt.tight_layout()
 plot_out = os.path.join(outputfolder, 'rq2_maihda_variance_decomp.png')
