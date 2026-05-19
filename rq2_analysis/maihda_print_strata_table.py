@@ -41,18 +41,17 @@ def label_strata(row):
     gen = "Male" if parts[1] == '1.0' else "Fem"
     ses_map = {'1': 'Low', '2': 'Med', '3': 'High'}
     ses = ses_map.get(parts[2][0], 'Low')
-    mig = "Native" if parts[4] == '1.0' else "Abroad"
-    par_mig = "Both-FB" if parts[3] == '1.0' else ("One-FB" if parts[3] == '2.0' else "Both-NB")
-    return f"{edu}-{gen}-{ses}-{par_mig}-{mig}"
+    mig = "Nat" if parts[4] == '1.0' else "For"
+    return f"{edu}-{gen}-{ses}-{mig}"
 
 # Step 2: Compiling descriptive cohort aggregations
-df_valid['Detailed_Label'] = df_valid.apply(label_strata, axis=1)
-
-res = df_valid.groupby('Detailed_Label').agg(
+res = df_valid.groupby('intersectional_id').agg(
     Mean_Score=('PV_AVG', 'mean'),
     SEM=('PV_AVG', lambda x: np.std(x, ddof=1) / np.sqrt(len(x)) if len(x) > 1 else 0),
     N_Students=('PV_AVG', 'count')
 ).reset_index()
+
+res['Detailed_Label'] = res.apply(label_strata, axis=1)
 
 res = res.sort_values('Mean_Score', ascending=False).reset_index(drop=True)
 
@@ -73,9 +72,9 @@ x_coords = [0.03, 0.08, 0.38, 0.48, 0.58]
 
 # Headers
 ax.text(x_coords[0], len(res) + 0.1, "Rank", weight='bold', fontsize=11, fontname='Times New Roman', ha='left')
-ax.text(x_coords[1], len(res) + 0.1, "Intersectional Cohort Profile", weight='bold', fontsize=11, fontname='Times New Roman', ha='left')
-ax.text(x_coords[2], len(res) + 0.1, "Mean Points", weight='bold', fontsize=11, fontname='Times New Roman', ha='center')
-ax.text(x_coords[3], len(res) + 0.1, "SEM (±)", weight='bold', fontsize=11, fontname='Times New Roman', ha='center')
+ax.text(x_coords[1], len(res) + 0.1, "Intersectional Cohort Mapping", weight='bold', fontsize=11, fontname='Times New Roman', ha='left')
+ax.text(x_coords[2], len(res) + 0.1, "Mean Score", weight='bold', fontsize=11, fontname='Times New Roman', ha='center')
+ax.text(x_coords[3], len(res) + 0.1, "SE (±)", weight='bold', fontsize=11, fontname='Times New Roman', ha='center')
 ax.text(x_coords[4], len(res) + 0.1, "N", weight='bold', fontsize=11, fontname='Times New Roman', ha='center')
 
 overall_mean = 279.80

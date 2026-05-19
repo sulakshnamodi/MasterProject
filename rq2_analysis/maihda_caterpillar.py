@@ -121,9 +121,9 @@ def label_strata(strata_id):
     elif parts[3] == '2.0':
         par = "ParMix"
     else:
-        par = "ParAbr"
+        par = "ParFor"
         
-    mig = "Native" if parts[4] == '1.0' else "Abroad"
+    mig = "Nat" if parts[4] == '1.0' else "For"
     return f"{edu}-{gen}-{ses}-{par}-{mig}"
 
 caterpillar_df['label'] = caterpillar_df['strata'].apply(label_strata)

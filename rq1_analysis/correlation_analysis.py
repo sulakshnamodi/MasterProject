@@ -36,7 +36,7 @@ df['Female'] = (df['GENDER_R'] == 2.0).astype(int)
 df['Foreign_Born'] = (df['A2_Q03a_T'] == 2.0).astype(int)
 
 cols_for_corr = ['Female', 'Foreign_Born', 'PAREDC2', 'READWORKC2_WLE_CA_T1', 'WRITWORKC2_WLE_CA', 'AVG_LIT']
-labels_for_corr = ['Female', 'Foreign-Born', 'Parental SES', 'Work Reading', 'Work Writing', 'Literacy']
+labels_for_corr = ['Female', 'Foreign-Born', 'SES', 'Work Reading', 'Work Writing', 'Literacy']
 
 # Helper for significance stars
 def get_stars(r, p):
@@ -125,7 +125,7 @@ for track_val, track_label in tracks.items():
     
     fig = plt.gcf()
     fig.text(0.05, 0.03, "* p < 0.05, ** p < 0.01, *** p < 0.001 (Survey-weighted p-values).", 
-             fontsize=10, style='italic')
+             fontsize=14, style='italic')
              
     track_str = "academic" if track_val == 0.0 else "vocational"
     plot_path = os.path.join(output_dir, f'rq4_1_correlation_heatmap_{track_str}.png')

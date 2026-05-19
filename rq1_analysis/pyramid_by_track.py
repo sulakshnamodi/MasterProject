@@ -18,13 +18,8 @@ with open(subdataset_filepath, 'rb') as f:
 
 df = loaded_data['dataframe'].copy()
 anchors = ['ED_GROUP', 'GENDER_R', 'PAREDC2', 'IMPARC2', 'A2_Q03a_T']
-work = ['READWORKC2_WLE_CA_T1', 'WRITWORKC2_WLE_CA']
-df = df.dropna(subset=anchors + work + ['SPFWT0']).copy()
+df = df.dropna(subset=anchors + ['SPFWT0']).copy()
 
-df['intersectional_id'] = df['ED_GROUP'].astype(str) + '_' + df['GENDER_R'].astype(str) + '_' + df['PAREDC2'].astype(str) + '_' + df['IMPARC2'].astype(str) + '_' + df['A2_Q03a_T'].astype(str)
-counts = df['intersectional_id'].value_counts()
-valid_ids = counts[counts >= 5].index
-df = df[df['intersectional_id'].isin(valid_ids)].copy()
 
 # -----------------------------------------------------------------------------
 # 2. DEFINE PLOTTING FUNCTION
@@ -84,7 +79,7 @@ def generate_track_pyramid(track_val, track_name, track_color, filename):
     layers = [
         (l0_fracs, l0_ns, l0_keys, l0_colors, 30, 0.0, "Track Pool"),
         (l1_fracs, l1_ns, l1_keys, l1_colors, 50, 0.8, "Gender"),
-        (l2_fracs, l2_ns, l2_keys, l2_colors, 70, 1.2, "Parental SES"),
+        (l2_fracs, l2_ns, l2_keys, l2_colors, 70, 1.2, "SES"),
         (l3_fracs, l3_ns, l3_keys, l3_colors, 90, 1.5, "Migration Status")
     ]
     
@@ -112,13 +107,10 @@ def generate_track_pyramid(track_val, track_name, track_color, filename):
                 txt_color = 'black' if c in ['#f4f1de', '#f2cc8f'] else 'white'
                 
                 if f > 0.015:
-                    if idx == 0:
-                        lbl = f"N={n:,}\n{f*100:.1f}%"
-                    else:
-                        lbl = f"{f*100:.1f}%"
+                    lbl = f"N={n:,}\n{f*100:.1f}%"
                         
                     ax.text(center_x, y_val, lbl, ha='center', va='center', 
-                            color=txt_color, fontsize=max(10, 14 - idx), weight='bold', zorder=4)
+                            color=txt_color, fontsize=max(9, 13 - idx), weight='bold', zorder=4)
                     
                 start_x += w + gap_w
                 

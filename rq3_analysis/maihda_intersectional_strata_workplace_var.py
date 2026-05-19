@@ -151,8 +151,9 @@ def label_strata(strat_id):
     parts = strat_id.split('_')
     edu = "Univ" if parts[0] == '0.0' else "Voc"
     gen = "Male" if parts[1] == '1.0' else "Fem"
-    ses = f"SES-{parts[2][0]}"
-    mig = "Native" if parts[4] == '1.0' else "Abroad"
+    ses_map = {'1': 'Low', '2': 'Med', '3': 'High'}
+    ses = ses_map.get(parts[2][0], 'Low')
+    mig = "Nat" if parts[4] == '1.0' else "For"
     return f"{edu}-{gen}-{ses}-{mig}"
 
 strata_sizes = analysis_df['intersectional_id'].value_counts()
