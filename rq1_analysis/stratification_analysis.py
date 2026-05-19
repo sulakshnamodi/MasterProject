@@ -11,7 +11,7 @@ import pickle
 # -----------------------------------------------------------------------------
 subdataset_root = r'G:\My Drive\Sulakshna\Sulakshna Drive\Codes\MasterProject\data\preprocessed\subdataset1'
 subdataset_filepath = os.path.join(subdataset_root, 'piaac_norway_subdataset1.pkl')
-output_dir = r'G:\My Drive\Sulakshna\Sulakshna Drive\Codes\MasterProject\rq1_analysis'
+output_dir = r'G:\My Drive\Sulakshna\Sulakshna Drive\Codes\MasterProject\results\rq1'
 
 # Create the output directory if it doesn't exist
 os.makedirs(output_dir, exist_ok=True)
@@ -60,7 +60,8 @@ for col in demographics:
                 'Demographic': col,
                 'Category': cat_label,
                 'Track': track_label,
-                'Weighted %': weighted_pct
+                'Weighted %': weighted_pct,
+                'N': unweighted_n
             })
 
 df_results_1_1 = pd.DataFrame(results_1_1)
@@ -72,7 +73,7 @@ def create_intersectional_label(row):
     gen = 'M' if row['GENDER_R'] == 1.0 else 'F'
     mig = 'Nat' if row['A2_Q03a_T'] == 1.0 else 'For'
     ses = 'Low' if row['PAREDC2'] == 1.0 else ('Med' if row['PAREDC2'] == 2.0 else 'High')
-    return f"{gen}-{mig}-{ses}"
+    return f"{gen}-{ses}-{mig}"
 
 df['intersectional_strata'] = df.apply(create_intersectional_label, axis=1)
 
@@ -120,8 +121,25 @@ for i, col in enumerate(demographics):
         zorder=3
     )
     
-    for c in ax.containers:
+    categories = list(mapping_config[col].values())
+    acad_data = plot_data[plot_data['Track'] == 'Academic (ISCED 5A/6)']
+    voc_data = plot_data[plot_data['Track'] == 'Vocational (ISCED 5B)']
+    
+    acad_ns = [acad_data[acad_data['Category'] == cat]['N'].values[0] if len(acad_data[acad_data['Category'] == cat]) > 0 else 0 for cat in categories]
+    voc_ns = [voc_data[voc_data['Category'] == cat]['N'].values[0] if len(voc_data[voc_data['Category'] == cat]) > 0 else 0 for cat in categories]
+
+    for hue_idx, c in enumerate(ax.containers):
         ax.bar_label(c, fmt='%.1f%%', padding=3, fontsize=10)
+        
+        for bar_idx, p in enumerate(c):
+            height = p.get_height()
+            if pd.isna(height) or height == 0: continue
+            
+            n_val = acad_ns[bar_idx] if hue_idx == 0 else voc_ns[bar_idx]
+            
+            if n_val > 0:
+                y_pos = height - 4 if height > 10 else height / 2
+                ax.text(p.get_x() + p.get_width() / 2., y_pos, f"{int(n_val)}", ha='center', va='top' if height > 10 else 'center', color='white', weight='bold', fontsize=9)
     
     # Styling copied from mean_literacy_by_strata.py
     ax.tick_params(axis='x', labelsize=14)
@@ -179,7 +197,7 @@ for c in ax_inter.containers:
     ax_inter.bar_label(c, fmt='%.1f%%', padding=3, fontsize=11)
 
 plt.tick_params(axis='both', labelsize=14)
-plt.title('Top 10 Intersectional Strata Across Tracks\n(Gender - Migration - SES)', fontsize=14, pad=10)
+plt.title('Top 10 Intersectional Strata Across Tracks\n(Gender - SES - Migration)', fontsize=14, pad=10)
 plt.xlabel('Weighted Percentage (%)', fontsize=14)
 plt.ylabel('')
 

@@ -135,7 +135,7 @@ def label_strata(row):
     gen = "Male" if parts[1] == '1.0' else "Fem"
     ses_map = {'1': 'Low', '2': 'Med', '3': 'High'}
     ses = ses_map.get(parts[2][0], 'Low')
-    mig = "Native" if parts[4] == '1.0' else "Abroad"
+    mig = "Nat" if parts[4] == '1.0' else "For"
     return f"{edu}-{gen}-{ses}-{mig}"
 
 analysis_df['label'] = analysis_df.apply(label_strata, axis=1)
@@ -153,7 +153,9 @@ order_labels = analysis_df.groupby('label')['PV_AVG'].mean().sort_values(ascendi
 
 plt.figure(figsize=(11, 13))
 colors = {0.0: "#1b9e77", 1.0: "#d95f02"}
-sns.barplot(x='PV_AVG', y='label', data=analysis_df, hue='ED_GROUP', dodge=False, palette=colors, order=order_labels, errorbar=('ci', 95))
+ax = sns.barplot(x='PV_AVG', y='label', data=analysis_df, hue='ED_GROUP', dodge=False, palette=colors, order=order_labels, errorbar=('ci', 95))
+new_labels = [label.get_text().replace('Univ-', '').replace('Voc-', '').replace('-', '_') for label in ax.get_yticklabels()]
+ax.set_yticklabels(new_labels)
 plt.axvline(analysis_df['PV_AVG'].mean(), color='black', linestyle='--', label='Grand Mean Proficiency')
 
 import matplotlib.patches as mpatches
@@ -166,7 +168,7 @@ ci_line = mlines.Line2D([], [], color='#424242', linewidth=2.5, marker='|', mark
 plt.legend(handles=[academic_patch, vocational_patch, mean_line, ci_line], title="", fontsize=14, loc='lower right', frameon=True, facecolor='whitesmoke', edgecolor='gray')
 
 plt.title('Proficiency Distributions Ranked by MAIHDA Category Blocks', fontsize=18, fontweight='bold', pad=20)
-plt.xlabel('Literacy Skills (Averaged)', fontsize=16, fontweight='bold', labelpad=12)
+plt.xlabel('Mean Literacy Score', fontsize=16, fontweight='bold', labelpad=12)
 plt.ylabel('Intersectional Cohort Mapping', fontsize=16, fontweight='bold', labelpad=12)
 plt.xticks(fontsize=14)
 plt.yticks(fontsize=14)
